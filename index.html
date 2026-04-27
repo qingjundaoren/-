@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>时空体质 · 五运六气与命理格局分析原型</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#08090a; --panel:#0f1011; --surface:#191a1b; --surface2:#202124;
+      --text:#f7f8f8; --muted:#8a8f98; --sub:#d0d6e0; --line:rgba(255,255,255,.08);
+      --line2:rgba(255,255,255,.05); --brand:#5e6ad2; --accent:#7170ff; --green:#10b981;
+      --red:#f87171; --orange:#f59e0b; --cyan:#22d3ee;
+      --wood:#34d399; --fire:#fb7185; --earth:#fbbf24; --metal:#cbd5e1; --water:#60a5fa;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:radial-gradient(circle at 50% -10%,rgba(94,106,210,.22),transparent 38%),var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;font-feature-settings:"cv01","ss03";}
+    .nav{position:sticky;top:0;z-index:10;background:rgba(8,9,10,.78);backdrop-filter:blur(18px);border-bottom:1px solid var(--line2)}
+    .nav-inner{max-width:1220px;margin:auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:590;letter-spacing:-.2px}.mark{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#111827);border:1px solid var(--line);display:grid;place-items:center}.mark:before{content:"氣";font-size:14px}.nav a{color:var(--sub);text-decoration:none;font-size:13px;font-weight:510;margin:0 8px}.pill{border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--sub);font-size:12px;background:rgba(255,255,255,.02)}
+    .hero{max-width:1220px;margin:0 auto;padding:72px 20px 36px;display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:center}.kicker{display:inline-flex;gap:8px;align-items:center;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.02);font-size:12px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
+    h1{font-size:58px;line-height:1.02;letter-spacing:-1.25px;margin:18px 0 18px;font-weight:510}.lead{font-size:18px;line-height:1.75;color:var(--muted);max-width:690px}.hero-card{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.018));border-radius:22px;padding:22px;box-shadow:inset 0 0 24px rgba(0,0,0,.26)}
+    .grid{max-width:1220px;margin:0 auto 70px;padding:0 20px;display:grid;grid-template-columns:390px 1fr;gap:20px}.card{border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;padding:18px}.card h2,.card h3{margin:0 0 14px;font-weight:590;letter-spacing:-.25px}.card h2{font-size:20px}.card h3{font-size:16px;color:var(--sub)}
+    label{display:block;font-size:12px;color:var(--muted);margin:13px 0 6px} input,select{width:100%;padding:12px 12px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.025);color:var(--text);font:14px 'Inter';outline:none} input:focus,select:focus{border-color:rgba(113,112,255,.7);box-shadow:0 0 0 3px rgba(113,112,255,.13)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{width:100%;margin-top:16px;background:var(--brand);color:white;border:0;border-radius:8px;padding:13px 16px;font-weight:590;cursor:pointer}.btn:hover{background:#7078e6}.small{font-size:12px;color:var(--muted);line-height:1.6}.warn{border-color:rgba(245,158,11,.28);background:rgba(245,158,11,.08);color:#fcd34d}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--sub);border-radius:999px;padding:7px 10px;font-size:12px;cursor:pointer}.tab.active{background:rgba(94,106,210,.22);border-color:rgba(113,112,255,.5);color:white}
+    .panel{display:none}.panel.active{display:block}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{border:1px solid var(--line2);border-radius:12px;background:rgba(255,255,255,.02);padding:14px}.metric b{display:block;font-size:22px;margin-bottom:4px}.metric span{color:var(--muted);font-size:12px}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.bar{height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;border-radius:999px;width:50%;background:var(--accent)}
+    table{width:100%;border-collapse:collapse;font-size:13px;overflow:hidden;border-radius:12px} th,td{border-bottom:1px solid var(--line2);padding:10px;text-align:left;color:var(--sub)} th{color:var(--muted);font-weight:510;background:rgba(255,255,255,.025)} tr:last-child td{border-bottom:0}.tag{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px 8px;margin:2px;font-size:12px;color:var(--sub);background:rgba(255,255,255,.02)}
+    .element-list{display:grid;gap:10px}.element{display:grid;grid-template-columns:52px 1fr 44px;gap:10px;align-items:center}.mono{font-family:'JetBrains Mono',monospace;color:var(--sub)}.risk{border-radius:12px;padding:12px;border:1px solid var(--line);background:rgba(255,255,255,.02);margin-bottom:10px}.risk.high{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.08)}.risk.mid{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.07)}.risk.low{border-color:rgba(16,185,129,.28);background:rgba(16,185,129,.06)}
+    .kv{display:grid;grid-template-columns:96px 1fr;gap:8px 12px;font-size:13px;color:var(--sub)}.kv b{color:var(--text)}.note{border-left:3px solid var(--accent);padding:10px 12px;background:rgba(113,112,255,.08);border-radius:8px;color:var(--sub);font-size:13px;line-height:1.65}.chipline{display:flex;flex-wrap:wrap;gap:6px}.chip{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:12px;color:var(--sub);background:rgba(255,255,255,.025)}
+    .footer{max-width:1220px;margin:0 auto;padding:20px 20px 60px;color:var(--muted);font-size:12px;line-height:1.7}.diagram{height:250px;position:relative;border-radius:16px;border:1px solid var(--line);background:radial-gradient(circle,rgba(113,112,255,.16),transparent 56%),rgba(255,255,255,.02);overflow:hidden}.orbit{position:absolute;inset:28px;border:1px solid rgba(255,255,255,.08);border-radius:50%}.orbit.o2{inset:62px}.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center}.node{position:absolute;padding:6px 8px;border:1px solid var(--line);border-radius:999px;background:#111;color:var(--sub);font-size:12px}.n1{left:50%;top:18px;transform:translateX(-50%)}.n2{right:20px;top:50%;transform:translateY(-50%)}.n3{left:50%;bottom:18px;transform:translateX(-50%)}.n4{left:20px;top:50%;transform:translateY(-50%)}
+    @media(max-width:920px){.hero,.grid{grid-template-columns:1fr}h1{font-size:40px}.metrics,.three,.two{grid-template-columns:1fr}.nav a{display:none}}
+  </style>
+</head>
+<body>
+  <header class="nav"><div class="nav-inner"><div class="brand"><div class="mark"></div>时空体质引擎</div><nav><a href="#input">输入</a><a href="#result">结果</a><a href="#model">理论模型</a></nav><span class="pill">研究原型 · 非医疗诊断</span></div></header>
+  <section class="hero">
+    <div><span class="kicker"><span class="dot"></span>五运六气 × 八字命理 × 中医体质</span><h1>输入生辰，生成出生时空、自然气化与疾病易感性关联图谱。</h1><p class="lead">本网页原型综合《黄帝内经》五运六气、刘完素运气脉法、陈远国运气临床应用思路与陆致极“出生时间编码/概率关联”模型，将出生干支、岁运司天、客主加临、命理五行结构、大运流年与脏腑体质倾向整合为可视化报告。</p></div>
+    <div class="hero-card"><div class="diagram"><div class="orbit"></div><div class="orbit o2"></div><div class="node n1">出生时空</div><div class="node n2">五运六气</div><div class="node n3">先天体质</div><div class="node n4">流年诱发</div><div class="center"><b style="font-size:28px">时空基因</b><br><span class="small">概率关联模型</span></div></div><p class="small" style="margin-top:14px">定位：辅助研究与中医辨证启发。所有输出必须结合四诊、真实气象、地域、家族史与现代医学检查。</p></div>
+  </section>
+  <main class="grid">
+    <aside class="card" id="input"><h2>输入资料</h2><div class="small warn card" style="padding:10px;margin-bottom:12px">当前版本已补充：立春换年、节气交接定月、真太阳时校正、按节气差精算起运岁数。天文算法为前端近似实现，正式临床/研究版仍建议接入权威历算库复核。</div>
+      <label>出生日期与时间（公历）</label><input id="birth" type="datetime-local" value="1990-04-18T08:30">
+      <div class="row"><div><label>性别</label><select id="gender"><option value="male">男</option><option value="female">女</option></select></div><div><label>出生地</label><input id="place" value="北京"></div></div>
+      <div class="row"><div><label>出生地经度（东经为正）</label><input id="longitude" type="number" step="0.0001" value="116.4074"></div><div><label>时区（中国为 +8）</label><input id="timezone" type="number" step="0.5" value="8"></div></div>
+      <div class="row"><div><label>当前分析年份</label><input id="year" type="number" value="2026"></div><div><label>当前节气段</label><select id="season"><option value="auto">按当前日期/出生月近似</option><option value="0">初之气</option><option value="1">二之气</option><option value="2">三之气</option><option value="3">四之气</option><option value="4">五之气</option><option value="5">终之气</option></select></div></div>
+      <button class="btn" onclick="run()">生成时空体质报告</button><p class="small">算法说明：输入时间按出生地民用时间；系统先换算为真太阳时，再以立春定年柱、十二节定月柱，以出生至下一/上一节气的时间差推起运。</p>
+    </aside>
+    <section class="card" id="result"><div class="tabs"><button class="tab active" data-tab="overview">总览</button><button class="tab" data-tab="bazi">命理格局</button><button class="tab" data-tab="yunqi">五运六气</button><button class="tab" data-tab="constitution">体质脏腑</button><button class="tab" data-tab="luck">大运流年</button><button class="tab" data-tab="risk">疾病易感</button></div>
+      <div id="overview" class="panel active"></div><div id="bazi" class="panel"></div><div id="yunqi" class="panel"></div><div id="constitution" class="panel"></div><div id="luck" class="panel"></div><div id="risk" class="panel"></div>
+    </section>
+  </main>
+  <section class="footer card" id="model"><h3>模型边界与产品化建议</h3><p>本设计把“出生时空 → 干支编码 → 五运六气气化 → 先天体质 → 流年诱发 → 疾病易感概率”作为研究框架，而非宿命论。产品化时应以统计验证为核心：将出生时空变量、真实气象变量、中医体质问卷、舌脉数据、疾病诊断和随访结局建立数据库，用回归/机器学习验证变量是否能提高预测能力。</p></section>
+<script>
+const stems='甲乙丙丁戊己庚辛壬癸'.split(''), branches='子丑寅卯辰巳午未申酉戌亥'.split('');
+const stemEl={甲:'木',乙:'木',丙:'火',丁:'火',戊:'土',己:'土',庚:'金',辛:'金',壬:'水',癸:'水'};
+const branchEl={子:'水',丑:'土',寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水'};
+const hidden={子:['癸'],丑:['己','癸','辛'],寅:['甲','丙','戊'],卯:['乙'],辰:['戊','乙','癸'],巳:['丙','戊','庚'],午:['丁','己'],未:['己','丁','乙'],申:['庚','壬','戊'],酉:['辛'],戌:['戊','辛','丁'],亥:['壬','甲']};
+const organ={木:'肝胆/筋目/情志',火:'心小肠/血脉/神志',土:'脾胃/肌肉/运化',金:'肺大肠/皮毛/肃降',水:'肾膀胱/骨髓/水液'};
+const climate={木:'风',火:'火热',土:'湿',金:'燥',水:'寒'};
+const elementOrder=['木','火','土','金','水'];
+const generates={木:'火',火:'土',土:'金',金:'水',水:'木'};
+const controls={木:'土',土:'水',水:'火',火:'金',金:'木'};
+const hiddenRoleNames=['本气','中气','余气'];
+const hiddenWeights=[0.6,0.3,0.1];
+const monthSeasonStrength={寅:'木',卯:'木',辰:'土',巳:'火',午:'火',未:'土',申:'金',酉:'金',戌:'土',亥:'水',子:'水',丑:'土'};
+const monthClimate={寅:'初春木旺，余寒未尽',卯:'仲春木旺，风木舒达',辰:'季春湿土，木土相杂',巳:'初夏火起，热势渐张',午:'仲夏火旺，炎热明显',未:'长夏湿土，湿热交蒸',申:'初秋金旺，燥气渐生',酉:'仲秋金旺，燥金肃降',戌:'季秋燥土，燥中带火',亥:'初冬水旺，寒气渐起',子:'仲冬水旺，寒水当令',丑:'季冬寒湿土，寒湿凝滞'};
+function yinYangOfStem(st){return stems.indexOf(st)%2===0?'阳':'阴'}
+function producedBy(el){return Object.keys(generates).find(k=>generates[k]===el)}
+function controlledBy(el){return Object.keys(controls).find(k=>controls[k]===el)}
+function tenGod(dayStem, otherStem){
+  const de=stemEl[dayStem], oe=stemEl[otherStem], samePol=yinYangOfStem(dayStem)===yinYangOfStem(otherStem);
+  if(de===oe) return samePol?'比肩':'劫财';
+  if(generates[de]===oe) return samePol?'食神':'伤官';
+  if(producedBy(de)===oe) return samePol?'偏印':'正印';
+  if(controls[de]===oe) return samePol?'偏财':'正财';
+  if(controlledBy(de)===oe) return samePol?'七杀':'正官';
+  return '—';
+}
+function tenGodElementType(dayEl, el){
+  if(dayEl===el) return '比劫';
+  if(generates[dayEl]===el) return '食伤';
+  if(producedBy(dayEl)===el) return '印星';
+  if(controls[dayEl]===el) return '财星';
+  if(controlledBy(dayEl)===el) return '官杀';
+  return '';
+}
+function relationOfElements(dayEl, el){return `${el}为${tenGodElementType(dayEl,el)}`}
+function hiddenStemRows(pillars, dayStem){
+  const names=['年支','月支','日支','时支'];
+  return pillars.map((p,i)=>({pos:names[i],branch:p[1],items:hidden[p[1]].map((h,j)=>({stem:h,role:hiddenRoleNames[j]||'余气',weight:hiddenWeights[j]||0.1,ten:tenGod(dayStem,h),el:stemEl[h]}))}));
+}
+function analyzeStrength(pillars){
+  const dayStem=pillars[2][0], dayEl=stemEl[dayStem], monthBr=pillars[1][1], seasonEl=monthSeasonStrength[monthBr];
+  let base=45, reasons=[];
+  if(seasonEl===dayEl){base+=25; reasons.push('日主得月令同气，根气较足');}
+  else if(generates[seasonEl]===dayEl){base+=16; reasons.push('月令生扶日主，有印星助身');}
+  else if(generates[dayEl]===seasonEl){base-=10; reasons.push('日主生月令，气有所泄');}
+  else if(controls[dayEl]===seasonEl){base-=12; reasons.push('日主克月令，耗力取财');}
+  else if(controls[seasonEl]===dayEl){base-=18; reasons.push('月令克日主，身受官杀制约');}
+  let support=0, drain=0;
+  pillars.forEach((p,idx)=>{
+    [p[0],...hidden[p[1]]].forEach((st,j)=>{let el=stemEl[st], w=(j===0?1:(hiddenWeights[j-1]||0.1)); if(el===dayEl||generates[el]===dayEl) support+=w; if(generates[dayEl]===el||controls[dayEl]===el||controls[el]===dayEl) drain+=w;});
+  });
+  base += Math.min(18,support*2.2)-Math.min(18,drain*1.4);
+  let roots=pillars.map(p=>hidden[p[1]].some(h=>stemEl[h]===dayEl)).filter(Boolean).length;
+  if(roots){base+=Math.min(12,roots*4); reasons.push(`地支藏干见${roots}处同类根气`)}
+  const score=Math.max(5,Math.min(95,Math.round(base)));
+  const level=score>=72?'身旺':score>=58?'偏旺':score>=43?'中和':score>=28?'偏弱':'身弱';
+  return {dayStem,dayEl,monthBr,seasonEl,score,level,reasons,climate:monthClimate[monthBr]};
+}
+function analyzePattern(pillars){
+  const dayStem=pillars[2][0], monthBr=pillars[1][1], mainHidden=hidden[monthBr][0], tg=tenGod(dayStem,mainHidden), dayEl=stemEl[dayStem];
+  const heavenly=pillars.map(p=>p[0]);
+  let protrude=heavenly.includes(mainHidden);
+  let sameTen=heavenly.filter(st=>tenGod(dayStem,st)===tg && st!==dayStem);
+  let pattern=tg+'格';
+  let note=`以月令${monthBr}中本气${mainHidden}为纲，取${tg}立格${protrude?'，且本气透干':'，本气未透，需参考透干与全局清浊'}。`;
+  if(['比肩','劫财'].includes(tg)) {pattern='建禄/月劫格'; note+=' 比劫当令，重点看财官食伤能否成用。'}
+  if(tg==='七杀') note+=' 七杀格须看制化：食神制杀、印化杀或身强任杀为佳。';
+  if(tg==='正官') note+=' 正官格喜清纯，不宜伤官混杂太重。';
+  if(['正印','偏印'].includes(tg)) note+=' 印格重在身印关系，过重则宜财星裁印或食伤流通。';
+  if(['食神','伤官'].includes(tg)) note+=' 食伤格重在泄秀生财，亦须防伤官见官。';
+  if(['正财','偏财'].includes(tg)) note+=' 财格重在身能任财，身弱则先取印比扶身。';
+  return {pattern,monthMain:mainHidden,ten:tg,protrude,sameTen,note,dayEl};
+}
+function analyzeUseful(pillars,strength){
+  const dayEl=strength.dayEl;
+  let useful=[], avoid=[], method=[];
+  if(['身旺','偏旺'].includes(strength.level)){
+    useful=[generates[dayEl],controls[dayEl],controlledBy(dayEl)]; avoid=[dayEl,producedBy(dayEl)]; method.push('日主偏旺，宜泄、耗、克，使气机流通');
+  }else if(['身弱','偏弱'].includes(strength.level)){
+    useful=[producedBy(dayEl),dayEl]; avoid=[generates[dayEl],controls[dayEl],controlledBy(dayEl)]; method.push('日主偏弱，宜印比生扶，先固本再言财官食伤');
+  }else{
+    useful=[generates[dayEl],controls[dayEl]]; avoid=[]; method.push('日主中和，宜取流通、调候与病药平衡');
+  }
+  const m=pillars[1][1]; let tiaohou=[];
+  if(['亥','子','丑'].includes(m)) tiaohou.push('冬令寒重，调候优先参考火，兼顾燥湿');
+  if(['巳','午','未'].includes(m)) tiaohou.push('夏令热盛，调候优先参考水，兼顾护津');
+  if(['申','酉','戌'].includes(m)) tiaohou.push('秋令燥金，调候宜润燥生津，水木可参');
+  if(['辰','未','丑'].includes(m)) tiaohou.push('湿土较重，宜审湿滞，木疏土、火化湿可参');
+  return {useful:[...new Set(useful)],avoid:[...new Set(avoid)],method,tiaohou};
+}
+const middleByStem={甲:['土','太过'],己:['土','不及'],乙:['金','不及'],庚:['金','太过'],丙:['水','太过'],辛:['水','不及'],丁:['木','不及'],壬:['木','太过'],戊:['火','太过'],癸:['火','不及']};
+const sitian={子:['少阴君火','阳明燥金'],午:['少阴君火','阳明燥金'],丑:['太阴湿土','太阳寒水'],未:['太阴湿土','太阳寒水'],寅:['少阳相火','厥阴风木'],申:['少阳相火','厥阴风木'],卯:['阳明燥金','少阴君火'],酉:['阳明燥金','少阴君火'],辰:['太阳寒水','太阴湿土'],戌:['太阳寒水','太阴湿土'],巳:['厥阴风木','少阳相火'],亥:['厥阴风木','少阳相火']};
+const qiOrder=['厥阴风木','少阴君火','太阴湿土','少阳相火','阳明燥金','太阳寒水'];
+const mainQi=['厥阴风木','少阴君火','少阳相火','太阴湿土','阳明燥金','太阳寒水'];
+const monthBranches='寅卯辰巳午未申酉戌亥子丑'.split('');
+const jieAngles=[315,345,15,45,75,105,135,165,195,225,255,285]; // 立春、惊蛰、清明、立夏、芒种、小暑、立秋、白露、寒露、立冬、大雪、小寒
+const jieNames=['立春','惊蛰','清明','立夏','芒种','小暑','立秋','白露','寒露','立冬','大雪','小寒'];
+const stepAngles=[300,0,60,120,180,240]; // 大寒、春分、小满、大暑、秋分、小雪；用于六步气交司
+const stepNames=['大寒','春分','小满','大暑','秋分','小雪'];
+function mod(n,m){return ((n%m)+m)%m} function pad(n){return String(n).padStart(2,'0')}
+function gzByIndex(i){return stems[mod(i,10)]+branches[mod(i,12)]}
+function ganzhiYearByIndex(y){return gzByIndex(y-4)}
+function jdFromDate(date){return date.getTime()/86400000+2440587.5} function dateFromJd(jd){return new Date((jd-2440587.5)*86400000)}
+function solarLongitude(date){ // apparent geocentric ecliptic longitude of sun, degrees; sufficient for minute-level term search in browser prototype
+  const T=(jdFromDate(date)-2451545.0)/36525;
+  const L0=mod(280.46646+36000.76983*T+0.0003032*T*T,360);
+  const M=357.52911+35999.05029*T-0.0001537*T*T;
+  const Mr=M*Math.PI/180;
+  const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(Mr)+(0.019993-0.000101*T)*Math.sin(2*Mr)+0.000289*Math.sin(3*Mr);
+  const trueLong=L0+C;
+  const omega=125.04-1934.136*T;
+  return mod(trueLong-0.00569-0.00478*Math.sin(omega*Math.PI/180),360);
+}
+function angleDiff(a,target){return mod(a-target+540,360)-180}
+function findSolarTerm(year, angle){
+  const approxDay={300:[0,20],315:[1,4],330:[1,19],345:[2,6],0:[2,21],15:[3,5],30:[3,20],45:[4,5],60:[4,21],75:[5,5],90:[5,21],105:[6,7],120:[6,23],135:[7,7],150:[7,23],165:[8,7],180:[8,23],195:[9,8],210:[9,23],225:[10,7],240:[10,22],255:[11,7],270:[11,22],285:[0,6]}[angle];
+  let y=year, mon=approxDay[0], day=approxDay[1]; if(angle===285) y=year+1;
+  let lo=new Date(Date.UTC(y,mon,day-3)), hi=new Date(Date.UTC(y,mon,day+3));
+  let flo=angleDiff(solarLongitude(lo),angle);
+  for(let k=0;k<60;k++){let mid=new Date((lo.getTime()+hi.getTime())/2), fm=angleDiff(solarLongitude(mid),angle); if((flo<=0&&fm<=0)||(flo>0&&fm>0)){lo=mid;flo=fm}else hi=mid}
+  return new Date((lo.getTime()+hi.getTime())/2);
+}
+function equationOfTimeMinutes(date){
+  const start=Date.UTC(date.getUTCFullYear(),0,0), N=(date.getTime()-start)/86400000;
+  const B=2*Math.PI*(N-81)/364;
+  return 9.87*Math.sin(2*B)-7.53*Math.cos(B)-1.5*Math.sin(B);
+}
+function trueSolarDate(localDate, longitude, tz){
+  const standardMeridian=tz*15;
+  const minutes=(longitude-standardMeridian)*4 + equationOfTimeMinutes(new Date(localDate.getTime()-tz*3600000));
+  return new Date(localDate.getTime()+minutes*60000);
+}
+function formatDate(d,tz=8){let x=new Date(d.getTime()+tz*3600000);return `${x.getUTCFullYear()}-${pad(x.getUTCMonth()+1)}-${pad(x.getUTCDate())} ${pad(x.getUTCHours())}:${pad(x.getUTCMinutes())}`}
+function yearPillarByLiChun(trueSolar, tz){
+  const y=trueSolar.getFullYear(), lc=findSolarTerm(y,315); // UTC instant
+  // trueSolar is civil Date object shifted to true solar clock; compare as local-like by converting term to local tz then no eot correction is acceptable for boundary display
+  const lcLocal=new Date(lc.getTime()+tz*3600000);
+  const boundary=new Date(lcLocal.getUTCFullYear(),lcLocal.getUTCMonth(),lcLocal.getUTCDate(),lcLocal.getUTCHours(),lcLocal.getUTCMinutes(),lcLocal.getUTCSeconds());
+  const yy=trueSolar<boundary?y-1:y; return {gz:ganzhiYearByIndex(yy), year:yy, lichun:boundary};
+}
+function monthPillarByJie(trueSolar, yearStem){
+  let y=trueSolar.getFullYear(), terms=[];
+  [y-1,y].forEach(yy=>jieAngles.forEach((ang,i)=>terms.push({name:jieNames[i],angle:ang,date:findSolarTerm(yy,ang),idx:i,yy})));
+  terms=terms.map(t=>({ ...t, local:new Date(t.date.getTime()+trueSolar.getTimezoneOffset()*0) })).sort((a,b)=>a.date-b.date);
+  // Compare against trueSolar timestamp treated as actual instant plus local browser offset caveat: for prototype, month boundary is represented after tz shift in run().
+  let birthUTC=window.__birthUTCForTerms;
+  let prev=terms.filter(t=>t.date<=birthUTC).pop(); if(!prev) prev=terms[0];
+  let mIdx=prev.idx; let yStemIdx=stems.indexOf(yearStem); let start=[2,4,6,8,0][Math.floor(yStemIdx/2)]; // 甲己年丙寅月
+  return {gz:stems[(start+mIdx)%10]+monthBranches[mIdx], jie:prev.name, idx:mIdx, boundary:prev.date};
+}
+function dayPillar(d){ // 以真太阳日为准；若采用子初换日，可在23:00后加一天
+  let dd=new Date(d); if(dd.getHours()>=23) dd=new Date(dd.getTime()+86400000);
+  let base=Date.UTC(2000,0,1), days=Math.floor((Date.UTC(dd.getFullYear(),dd.getMonth(),dd.getDate())-base)/86400000); let idx=mod(16+days,60); return gzByIndex(idx)
+}
+function hourBranch(h){return branches[Math.floor(((h+1)%24)/2)]} function hourPillar(dayStem,h){let b=hourBranch(h), bi=branches.indexOf(b);let start={甲:0,己:0,乙:2,庚:2,丙:4,辛:4,丁:6,壬:6,戊:8,癸:8}[dayStem]; return stems[(start+bi)%10]+b}
+function qiStepByTerm(birthUTC){let y=new Date(birthUTC).getUTCFullYear(), terms=[];[y-1,y].forEach(yy=>stepAngles.forEach((a,i)=>terms.push({idx:i,name:stepNames[i],date:findSolarTerm(yy,a)}))); terms.sort((a,b)=>a.date-b.date); let prev=terms.filter(t=>t.date<=birthUTC).pop()||terms[0]; return prev.idx}
+function guestQiForBranch(br){let st=sitian[br][0], idx=qiOrder.indexOf(st), arr=[]; for(let step=0;step<6;step++) arr[step]=qiOrder[(idx-2+step+6)%6]; return arr}
+function elFromQi(q){return q.includes('木')?'木':q.includes('火')?'火':q.includes('土')?'土':q.includes('金')?'金':'水'}
+function scoreBazi(pillars){let s={木:0,火:0,土:0,金:0,水:0}; pillars.forEach(p=>{s[stemEl[p[0]]]+=1.2;s[branchEl[p[1]]]+=1; hidden[p[1]].forEach((h,i)=>s[stemEl[h]]+= i?0.25:0.45)});return s}
+function stemYang(st){return stems.indexOf(st)%2===0}
+function nextPrevJie(birthUTC, forward){let y=birthUTC.getUTCFullYear(), arr=[];[y-1,y,y+1].forEach(yy=>jieAngles.forEach((a,i)=>arr.push({name:jieNames[i],idx:i,date:findSolarTerm(yy,a)}))); arr.sort((a,b)=>a.date-b.date); return forward?arr.find(t=>t.date>birthUTC):arr.filter(t=>t.date<birthUTC).pop()}
+function calcStartAge(birthUTC, forward){let t=nextPrevJie(birthUTC,forward);let diffDays=Math.abs(t.date-birthUTC)/86400000;let totalMonths=diffDays*4;let years=Math.floor(totalMonths/12), months=Math.floor(totalMonths%12), days=Math.round((totalMonths-years*12-months)*30);return {term:t, diffDays, years, months, days, decimal:diffDays/3}}
+function luckPillars(monthGz, gender, yearStem, birthUTC){let forward=(gender==='male'&&stemYang(yearStem))||(gender==='female'&&!stemYang(yearStem));let startAge=calcStartAge(birthUTC,forward);let si=stems.indexOf(monthGz[0]), bi=branches.indexOf(monthGz[1]);let arr=[]; for(let i=1;i<=8;i++){let n=forward?i:-i;let age0=startAge.decimal+(i-1)*10, age1=age0+10;arr.push({age:`${age0.toFixed(1)}-${age1.toFixed(1)}`,gz:stems[mod(si+n,10)]+branches[mod(bi+n,12)]})} return {forward,arr,startAge}}
+function levelClass(v){return v>=70?'high':v>=45?'mid':'low'}
+function run(){
+  let raw=document.getElementById('birth').value; if(!raw) return; let local=new Date(raw); let tz=+document.getElementById('timezone').value||8, lon=+document.getElementById('longitude').value||120;
+  let gender=document.getElementById('gender').value, nowY=+document.getElementById('year').value;
+  let utcBirth=new Date(local.getTime()-tz*3600000); window.__birthUTCForTerms=utcBirth;
+  let trueSolar=trueSolarDate(local,lon,tz);
+  let yInfo=yearPillarByLiChun(trueSolar,tz), ygz=yInfo.gz, mInfo=monthPillarByJie(trueSolar, ygz[0]), mgz=mInfo.gz, dgz=dayPillar(trueSolar), hgz=hourPillar(dgz[0],trueSolar.getHours());
+  let pillars=[ygz,mgz,dgz,hgz]; let scores=scoreBazi(pillars); let total=Object.values(scores).reduce((a,b)=>a+b,0); let pct={}; Object.keys(scores).forEach(e=>pct[e]=Math.round(scores[e]/total*100));
+  let strength=analyzeStrength(pillars), pattern=analyzePattern(pillars), useful=analyzeUseful(pillars,strength), hiddenRows=hiddenStemRows(pillars,dgz[0]);
+  let natStem=ygz[0], natBr=ygz[1], mid=middleByStem[natStem], st=sitian[natBr], step=qiStepByTerm(utcBirth), guests=guestQiForBranch(natBr);
+  let curGz=ganzhiYearByIndex(nowY), curMid=middleByStem[curGz[0]], curSt=sitian[curGz[1]], curGuests=guestQiForBranch(curGz[1]);let curStep=document.getElementById('season').value==='auto'?qiStepByTerm(new Date()):+document.getElementById('season').value;let luck=luckPillars(mgz,gender,ygz[0],utcBirth);
+  let weak=Object.entries(pct).sort((a,b)=>a[1]-b[1]).slice(0,2), strong=Object.entries(pct).sort((a,b)=>b[1]-a[1]).slice(0,2);let currentEnergy=[curMid[0],elFromQi(curSt[0]),elFromQi(curSt[1]),elFromQi(curGuests[curStep]),elFromQi(mainQi[curStep])];let riskRows=['木','火','土','金','水'].map(e=>{let burden=currentEnergy.filter(x=>x===e).length*18 + (pct[e]>28?18:0) + (pct[e]<15?12:0); return {e,score:Math.min(95,Math.round(burden+15)),text:pct[e]<15?'先天偏弱，遇相关岁气易表现功能不足或被乘侮':pct[e]>28?'先天偏盛，遇同气易亢盛化病':'基础平衡，主要看流年与生活方式'} }).sort((a,b)=>b.score-a.score);
+  document.getElementById('overview').innerHTML=`<div class="metrics"><div class="metric"><b>${pillars.join(' ')}</b><span>四柱八字（精排）</span></div><div class="metric"><b>${mid[0]}运${mid[1]}</b><span>出生年中运</span></div><div class="metric"><b>${st[0]}</b><span>司天</span></div><div class="metric"><b>${st[1]}</b><span>在泉</span></div></div><div class="two" style="margin-top:14px"><div class="card"><h3>精排依据</h3><p>民用出生时间：<b>${raw.replace('T',' ')}</b>；真太阳时约：<b>${formatDate(new Date(trueSolar.getTime()-tz*3600000),tz)}</b>。年柱以立春换年，当前取 <b>${yInfo.year}</b> 运气年；月柱以最近节气 <b>${mInfo.jie}</b> 定月。</p></div><div class="card"><h3>出生气化摘要</h3><p>出生于 <b>${ygz}</b> 年，<b>${mid[0]}运${mid[1]}</b>，<b>${st[0]}司天、${st[1]}在泉</b>。六步为 <b>${['初','二','三','四','五','终'][step]}之气</b>，主气 <b>${mainQi[step]}</b>，客气 <b>${guests[step]}</b>。</p></div></div>`;
+  document.getElementById('bazi').innerHTML=`<div class="three">${['年柱','月柱','日柱','时柱'].map((n,i)=>`<div class="metric"><b>${pillars[i]}</b><span>${n} · ${stemEl[pillars[i][0]]}/${branchEl[pillars[i][1]]} · 天干十神：${i===2?'日主':tenGod(dgz[0],pillars[i][0])}</span></div>`).join('')}</div><h3 style="margin-top:18px">五行结构</h3><div class="element-list">${['木','火','土','金','水'].map(e=>`<div class="element"><span>${e}</span><div class="bar"><i style="width:${pct[e]}%;background:var(--${{木:'wood',火:'fire',土:'earth',金:'metal',水:'water'}[e]})"></i></div><span class="mono">${pct[e]}%</span></div>`).join('')}</div><div class="two" style="margin-top:18px"><div class="card"><h3>日主旺衰</h3><div class="kv"><span>日主</span><b>${dgz[0]}${strength.dayEl}（${yinYangOfStem(dgz[0])}）</b><span>月令</span><b>${strength.monthBr}月 · ${strength.climate}</b><span>评分</span><b>${strength.score}/100 · ${strength.level}</b><span>说明</span><b>${strength.reasons.join('；')||'综合月令、根气、生扶耗克后偏中和'}</b></div></div><div class="card"><h3>格局初判</h3><div class="kv"><span>月令本气</span><b>${pattern.monthMain} · ${pattern.ten}</b><span>格局</span><b>${pattern.pattern}</b><span>透干</span><b>${pattern.protrude?'月令本气透出':'本气未透'}${pattern.sameTen.length?'；同类十神透：'+pattern.sameTen.join('、'):''}</b></div><p class="small">${pattern.note}</p></div></div><h3 style="margin-top:18px">藏干与十神</h3><table><tr><th>地支</th><th>藏干</th><th>十神/五行</th></tr>${hiddenRows.map(r=>`<tr><td>${r.pos} ${r.branch}</td><td>${r.items.map(x=>`${x.role}:${x.stem}`).join('、')}</td><td>${r.items.map(x=>`${x.stem}${x.el}=${x.ten}`).join('、')}</td></tr>`).join('')}</table><h3 style="margin-top:18px">用神 / 忌神启发</h3><div class="two"><div class="card"><h3>倾向用神</h3><div class="chipline">${useful.useful.map(e=>`<span class="chip">${e}：${relationOfElements(strength.dayEl,e)} / ${organ[e]}</span>`).join('')}</div><p class="small">${useful.method.join('；')}。${useful.tiaohou.join('；')}</p></div><div class="card"><h3>倾向忌神</h3><div class="chipline">${useful.avoid.length?useful.avoid.map(e=>`<span class="chip">${e}：${relationOfElements(strength.dayEl,e)}</span>`).join(''):'<span class="chip">中和局以过偏者为忌</span>'}</div><p class="small">用忌为简化平衡模型，正式命理还需刑冲合害、合化、通关、调候、病药、岁运引动综合判断。</p></div></div>`;
+  document.getElementById('yunqi').innerHTML=`<table><tr><th>层次</th><th>出生年</th><th>当前流年 ${curGz}</th></tr><tr><td>中运</td><td>${mid[0]}运${mid[1]}（${climate[mid[0]]}）</td><td>${curMid[0]}运${curMid[1]}（${climate[curMid[0]]}）</td></tr><tr><td>司天</td><td>${st[0]}</td><td>${curSt[0]}</td></tr><tr><td>在泉</td><td>${st[1]}</td><td>${curSt[1]}</td></tr><tr><td>步气</td><td>${mainQi[step]} 主 + ${guests[step]} 客</td><td>${mainQi[curStep]} 主 + ${curGuests[curStep]} 客</td></tr></table><h3 style="margin-top:18px">出生年六步客气</h3><table><tr><th>步气</th><th>主气</th><th>客气</th><th>关系</th></tr>${mainQi.map((q,i)=>{let a=elFromQi(q),b=elFromQi(guests[i]);return `<tr><td>${['初','二','三','四','五','终'][i]}之气</td><td>${q}</td><td>${guests[i]}</td><td>${a===b?'同气相得':'主客异气'}</td></tr>`}).join('')}</table>`;
+  document.getElementById('constitution').innerHTML=`<div class="two"><div class="card"><h3>先天偏强</h3>${strong.map(x=>`<p><b>${x[0]}</b>：${organ[x[0]]}；可能表现为${climate[x[0]]}性偏盛或相关脏腑功能反应较敏。</p>`).join('')}</div><div class="card"><h3>先天偏弱</h3>${weak.map(x=>`<p><b>${x[0]}</b>：${organ[x[0]]}；遇岁气克伐或同类不足时，可能表现为相关系统易感。</p>`).join('')}</div></div><div class="note" style="margin-top:14px">日主旺衰为 <b>${strength.level}</b>，格局初判为 <b>${pattern.pattern}</b>。从体质转译看，用神倾向可视为“调偏补弊”的方向：${useful.useful.map(e=>e+organ[e]).join('；')}。但中医临床仍须以四诊合参为准。</div><p class="small">中医临床应再结合体质问卷、舌脉、既往病史。这里的“强弱”仅为出生时空模型的先验提示。</p>`;
+  document.getElementById('luck').innerHTML=`<p>大运方向：<b>${luck.forward?'顺行':'逆行'}</b>（阳男阴女顺、阴男阳女逆）。起运按出生至<b>${luck.forward?'下一':'上一'}节气</b> <b>${luck.startAge.term.name}</b> 的时间差计算：约 <b>${luck.startAge.diffDays.toFixed(2)}</b> 日，折合 <b>${luck.startAge.years}岁${luck.startAge.months}个月${luck.startAge.days}天</b> 起运。</p><table><tr><th>年龄段</th><th>大运</th><th>五行提示</th></tr>${luck.arr.map(r=>`<tr><td>${r.age}</td><td>${r.gz}</td><td>${stemEl[r.gz[0]]}/${branchEl[r.gz[1]]}</td></tr>`).join('')}</table><h3 style="margin-top:18px">当前流年</h3><p>${nowY} 年为 <b>${curGz}</b>，中运 <b>${curMid[0]}${curMid[1]}</b>，${curSt[0]}司天、${curSt[1]}在泉。</p>`;
+  document.getElementById('risk').innerHTML=`<h3>当前流年疾病易感性概率关联</h3>${riskRows.map(r=>`<div class="risk ${levelClass(r.score)}"><b>${r.e} · ${organ[r.e]} <span class="mono">${r.score}/100</span></b><div class="bar" style="margin:9px 0"><i style="width:${r.score}%;background:${r.score>=70?'var(--red)':r.score>=45?'var(--orange)':'var(--green)'}"></i></div><p class="small">${r.text}。当前流年能量含：${currentEnergy.join('、')}；对应气候病机为${climate[r.e]}。</p></div>`).join('')}<p class="small warn card" style="padding:10px">此处风险为模型评分，不等于医学诊断或真实发病率。若有症状，请就医并结合现代检查。</p>`;
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.getElementById(t.dataset.tab).classList.add('active')}); run();
+</script>
+</body>
+</html>
